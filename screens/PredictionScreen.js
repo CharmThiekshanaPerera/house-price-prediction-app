@@ -27,7 +27,7 @@ const PredictScreen = () => {
 
   const handlePredict = async () => {
     try {
-      const response = await axios.post('http://100.93.205.207:5000/predict', formData, {
+      const response = await axios.post('http://192.168.8.143:5000/predict', formData, {
         headers: { 'Content-Type': 'application/json' }
       });
       setPrediction(response.data.prediction);
