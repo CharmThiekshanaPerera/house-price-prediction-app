@@ -16,9 +16,9 @@ export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.navigate('User')} style={styles.userIcon}>
-          <Ionicons name="person-circle" size={40} color="#fff" />
-        </TouchableOpacity>
+      {/* <TouchableOpacity onPress={() => navigation.navigate('User')} style={styles.userIcon}>
+        <Ionicons name="person-circle" size={40} color="#fff" />
+      </TouchableOpacity> */}
         <Text style={styles.title}>House Price Prediction</Text>
       </View>
 

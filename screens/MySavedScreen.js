@@ -1,24 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MySavedScreen = () => {
   const [savedPredictions, setSavedPredictions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Fetch saved predictions from AsyncStorage
-  useEffect(() => {
-    const fetchSavedPredictions = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem('savedPredictions');
-        const data = jsonValue ? JSON.parse(jsonValue) : [];
-        setSavedPredictions(data);
-      } catch (e) {
-        console.error('Error fetching saved predictions:', e);
-      }
-    };
+  const fetchSavedPredictions = async () => {
+    try {
+      setLoading(true);
+      const jsonValue = await AsyncStorage.getItem('savedPredictions');
+      const data = jsonValue ? JSON.parse(jsonValue) : [];
+      setSavedPredictions(data);
+    } catch (e) {
+      console.error('Error fetching saved predictions:', e);
+      Alert.alert('Error', 'Failed to load saved predictions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSavedPredictions();
   }, []);
+
+  // Pull-to-refresh functionality
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchSavedPredictions();
+    setRefreshing(false);
+  };
 
   // Delete a specific prediction
   const deletePrediction = async (index) => {
@@ -55,13 +68,19 @@ const MySavedScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Saved Predictions</Text>
-      {savedPredictions.length === 0 ? (
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#034B63" style={styles.loader} />
+      ) : savedPredictions.length === 0 ? (
         <Text style={styles.noDataText}>No saved predictions available.</Text>
       ) : (
         <FlatList
           data={savedPredictions}
           keyExtractor={(item, index) => index.toString()}
           renderItem={renderItem}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#034B63']} />
+          }
         />
       )}
     </View>
@@ -80,6 +99,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 20,
     color: '#034B63',
+  },
+  loader: {
+    marginTop: 50,
   },
   noDataText: {
     textAlign: 'center',
