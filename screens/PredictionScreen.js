@@ -35,7 +35,8 @@ const PredictScreen = ({ navigation }) => {
       const response = await axios.post('http://192.168.8.143:5000/predict', formData, {
         headers: { 'Content-Type': 'application/json' }
       });
-      setPrediction(response.data.prediction);
+      const adjustedPrediction = response.data.prediction * 100;
+      setPrediction(adjustedPrediction);
       setModalVisible(true);
     } catch (error) {
       Alert.alert('Error', 'Failed to fetch prediction');
