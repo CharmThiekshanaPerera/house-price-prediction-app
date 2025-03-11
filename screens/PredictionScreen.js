@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Alert, ScrollView, Modal, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Alert,
+  ScrollView,
+  Modal,
+  TouchableOpacity,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 
 const PredictScreen = ({ navigation }) => {
   const [formData, setFormData] = useState({
@@ -32,10 +42,24 @@ const PredictScreen = ({ navigation }) => {
 
   const handlePredict = async () => {
     try {
-      const response = await axios.post('http://192.168.8.143:5000/predict', formData, {
-        headers: { 'Content-Type': 'application/json' }
+      // Convert "Yes" to 1 and "No" to 0 for binary fields
+      const binaryFields = [
+        'has_basement',
+        'renovated',
+        'nice_view',
+        'perfect_condition',
+        'has_lavatory',
+        'single_floor',
+      ];
+      const payload = { ...formData };
+      binaryFields.forEach((field) => {
+        payload[field] = payload[field] === 'Yes' ? 1 : 0;
       });
-      const adjustedPrediction = response.data.prediction * 100;
+
+      const response = await axios.post('http://192.168.8.143:5000/predict', payload, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const adjustedPrediction = response.data.prediction * 10;
       setPrediction(adjustedPrediction);
       setModalVisible(true);
     } catch (error) {
@@ -78,13 +102,32 @@ const PredictScreen = ({ navigation }) => {
       {Object.keys(formData).map((key) => (
         <View key={key} style={styles.inputContainer}>
           <Text style={styles.label}>{key.replace(/_/g, ' ').toUpperCase()}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={`Enter ${key.replace(/_/g, ' ')}`}
-            value={formData[key]}
-            onChangeText={(text) => handleInputChange(key, text)}
-            keyboardType="numeric"
-          />
+          {[
+            'has_basement',
+            'renovated',
+            'nice_view',
+            'perfect_condition',
+            'has_lavatory',
+            'single_floor',
+          ].includes(key) ? (
+            <Picker
+              selectedValue={formData[key]}
+              style={styles.picker}
+              onValueChange={(itemValue) => handleInputChange(key, itemValue)}
+            >
+              <Picker.Item label="Select" value="" />
+              <Picker.Item label="Yes" value="Yes" />
+              <Picker.Item label="No" value="No" />
+            </Picker>
+          ) : (
+            <TextInput
+              style={styles.input}
+              placeholder={`Enter ${key.replace(/_/g, ' ')}`}
+              value={formData[key]}
+              onChangeText={(text) => handleInputChange(key, text)}
+              keyboardType="numeric"
+            />
+          )}
         </View>
       ))}
 
@@ -100,7 +143,22 @@ const PredictScreen = ({ navigation }) => {
             {prediction && <Text style={styles.result}>Rs. {prediction.toFixed(0)}.00/=</Text>}
             <Text style={styles.modalSubtitle}>Summary of Input Data:</Text>
             {Object.entries(formData).map(([key, value]) => (
-              <Text key={key} style={styles.modalText}>{`${key.replace(/_/g, ' ')}: ${value}`}</Text>
+              <Text key={key} style={styles.modalText}>
+                {`${key.replace(/_/g, ' ')}: ${
+                  [
+                    'has_basement',
+                    'renovated',
+                    'nice_view',
+                    'perfect_condition',
+                    'has_lavatory',
+                    'single_floor',
+                  ].includes(key)
+                    ? value === 'Yes'
+                      ? 'Yes'
+                      : 'No'
+                    : value
+                }`}
+              </Text>
             ))}
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -120,7 +178,7 @@ const PredictScreen = ({ navigation }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>How to Use</Text>
             <Text style={styles.modalText}>1. Fill in all required fields with accurate data.</Text>
-            <Text style={styles.modalText}>2. Use numeric values (e.g., 1 for Yes, 0 for No).</Text>
+            <Text style={styles.modalText}>2. Use the dropdown to select "Yes" or "No" for binary fields.</Text>
             <Text style={styles.modalText}>3. Tap 'Predict Price' to get the estimated value.</Text>
             <Text style={styles.modalText}>4. Save the prediction for future reference if needed.</Text>
             <TouchableOpacity style={styles.closeButton} onPress={() => setInstructionModal(false)}>
@@ -138,14 +196,14 @@ const PredictScreen = ({ navigation }) => {
             <ScrollView style={{ maxHeight: 300 }}>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Number of Bedrooms:</Text> Total bedrooms in the house.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Grade:</Text> Overall construction quality and design grade.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Has Basement:</Text> 1 for Yes, 0 for No.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Has Basement:</Text> Yes or No.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Living Area (in m²):</Text> Total living area in square meters.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Renovated:</Text> 1 for Yes, 0 for No.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Nice View:</Text> 1 for Yes, 0 for No.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Perfect Condition:</Text> 1 for Yes, 0 for No.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Renovated:</Text> Yes or No.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Nice View:</Text> Yes or No.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Perfect Condition:</Text> Yes or No.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Number of Bathrooms:</Text> Total number of bathrooms.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Has Lavatory:</Text> 1 for Yes, 0 for No.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Single Floor:</Text> 1 for Yes, 0 for No.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Has Lavatory:</Text> Yes or No.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Single Floor:</Text> Yes or No.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Month:</Text> Month when the house was listed.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Quartile Zone:</Text> Zone classification based on location.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Year:</Text> The year the house was built.</Text>
@@ -209,6 +267,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  picker: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E3D2C3',
+    marginBottom: 16,
   },
   predictButton: {
     width: '100%',
@@ -292,7 +359,7 @@ const styles = StyleSheet.create({
   closeButton: {
     flex: 1,
     height: 40,
-    backgroundColor: '#FF7F7F',
+    backgroundColor: '#E3D2C3',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
