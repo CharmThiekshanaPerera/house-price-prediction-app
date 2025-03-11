@@ -32,7 +32,7 @@ export default function BottomTabNavigator() {
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: 'tomato',
+        tabBarActiveTintColor: '#66D2CE',
         tabBarInactiveTintColor: 'gray',
       })}
     >
