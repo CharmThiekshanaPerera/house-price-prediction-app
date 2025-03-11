@@ -28,8 +28,18 @@ export default function UserScreen({ navigation }) {
   }, []);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('currentUserEmail');
-    navigation.replace('Login');
+    try {
+      // Clear all user-specific data
+      await AsyncStorage.removeItem('currentUserEmail');
+      await AsyncStorage.removeItem('savedPredictions');
+      // Optionally, clear any other user-specific data here
+
+      // Navigate to the Login screen
+      navigation.replace('Login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Alert.alert('Error', 'Failed to logout');
+    }
   };
 
   const handleSave = async () => {
@@ -58,6 +68,8 @@ export default function UserScreen({ navigation }) {
           try {
             await AsyncStorage.removeItem(user.email);
             await AsyncStorage.removeItem('currentUserEmail');
+            await AsyncStorage.removeItem('savedPredictions');
+            // Optionally, clear any other user-specific data here
             navigation.replace('Signup');
           } catch (error) {
             Alert.alert('Error', 'Failed to delete account');
@@ -144,9 +156,10 @@ export default function UserScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
-    //backgroundColor: '#f0f8ff',
+    backgroundColor: '#EAEAEA',
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
   loadingContainer: {
     flex: 1,
@@ -154,93 +167,128 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#034B63',
+    color: '#2DAA9E',
     textAlign: 'center',
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    marginTop: 10,
-    color: '#555',
+    color: '#2DAA9E',
+    marginBottom: 8,
   },
   info: {
-    fontSize: 18,
-    marginBottom: 10,
+    fontSize: 14,
     color: '#333',
+    marginBottom: 16,
   },
   editButton: {
-    backgroundColor: '#1E90FF',
-    padding: 12,
-    borderRadius: 10,
-    marginTop: 15,
+    backgroundColor: '#2DAA9E',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   logoutButton: {
-    backgroundColor: '#FFA500',
-    padding: 12,
-    borderRadius: 10,
-    marginTop: 10,
+    backgroundColor: '#00d2ff',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   deleteButton: {
-    backgroundColor: '#FF6347',
-    padding: 12,
-    borderRadius: 10,
-    marginTop: 10,
+    backgroundColor: '#FF7F7F',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     alignItems: 'center',
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#fff',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '85%',
+    width: '90%',
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 20,
-    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#034B63',
+    color: '#2DAA9E',
+    marginBottom: 16,
     textAlign: 'center',
-    marginBottom: 15,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
+    paddingHorizontal: 16,
     fontSize: 16,
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#E3D2C3',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 16,
   },
   saveButton: {
-    backgroundColor: '#32CD32',
-    padding: 12,
+    flex: 1,
+    height: 40,
+    backgroundColor: '#2DAA9E',
     borderRadius: 8,
-    width: '48%',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 10,
   },
   cancelButton: {
-    backgroundColor: '#FF4500',
-    padding: 12,
+    flex: 1,
+    height: 40,
+    backgroundColor: '#E3D2C3',
     borderRadius: 8,
-    width: '48%',
+    justifyContent: 'center',
     alignItems: 'center',
   },
 });
