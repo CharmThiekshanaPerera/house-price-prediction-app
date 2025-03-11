@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   closeButton: {
     flex: 1,
     height: 40,
-    backgroundColor: '#E3D2C3',
+    backgroundColor: '#FF7F7F',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
