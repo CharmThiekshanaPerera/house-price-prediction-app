@@ -28,8 +28,18 @@ export default function UserScreen({ navigation }) {
   }, []);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('currentUserEmail');
-    navigation.replace('Login');
+    try {
+      // Clear all user-specific data
+      await AsyncStorage.removeItem('currentUserEmail');
+      await AsyncStorage.removeItem('savedPredictions');
+      // Optionally, clear any other user-specific data here
+
+      // Navigate to the Login screen
+      navigation.replace('Login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Alert.alert('Error', 'Failed to logout');
+    }
   };
 
   const handleSave = async () => {
@@ -58,6 +68,8 @@ export default function UserScreen({ navigation }) {
           try {
             await AsyncStorage.removeItem(user.email);
             await AsyncStorage.removeItem('currentUserEmail');
+            await AsyncStorage.removeItem('savedPredictions');
+            // Optionally, clear any other user-specific data here
             navigation.replace('Signup');
           } catch (error) {
             Alert.alert('Error', 'Failed to delete account');
