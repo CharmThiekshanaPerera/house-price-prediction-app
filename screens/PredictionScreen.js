@@ -42,6 +42,30 @@ const PredictScreen = ({ navigation }) => {
 
   const handlePredict = async () => {
     try {
+      // Validate inputs
+      const requiredFields = [
+        'bedrooms',
+        'grade',
+        'has_basement',
+        'living_in_m2',
+        'renovated',
+        'nice_view',
+        'perfect_condition',
+        'real_bathrooms',
+        'has_lavatory',
+        'single_floor',
+        'month',
+        'quartile_zone',
+        'year',
+      ];
+
+      for (const field of requiredFields) {
+        if (!formData[field]) {
+          Alert.alert('Error', `Please fill out the ${field.replace(/_/g, ' ')} field.`);
+          return;
+        }
+      }
+
       // Convert "Yes" to 1 and "No" to 0 for binary fields
       const binaryFields = [
         'has_basement',
@@ -56,15 +80,32 @@ const PredictScreen = ({ navigation }) => {
         payload[field] = payload[field] === 'Yes' ? 1 : 0;
       });
 
-      const response = await axios.post('http://192.168.8.143:5000/predict', payload, {
+      // Convert numeric fields to numbers
+      const numericFields = [
+        'bedrooms',
+        'grade',
+        'living_in_m2',
+        'real_bathrooms',
+        'month',
+        'quartile_zone',
+        'year',
+      ];
+      numericFields.forEach((field) => {
+        payload[field] = Number(payload[field]);
+      });
+
+      console.log('Payload:', payload); // Debugging: Log the payload
+
+      const response = await axios.post('http://10.135.151.132:5000/predict', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
+
       const adjustedPrediction = response.data.prediction * 10;
       setPrediction(adjustedPrediction);
       setModalVisible(true);
     } catch (error) {
-      Alert.alert('Error', 'Failed to fetch prediction');
-      console.error(error);
+      console.error('Error:', error.response?.data || error.message); // Debugging: Log the error
+      Alert.alert('Error', 'Failed to fetch prediction. Please check your inputs.');
     }
   };
 
@@ -143,8 +184,8 @@ const PredictScreen = ({ navigation }) => {
             {prediction && <Text style={styles.result}>Rs. {prediction.toFixed(0)}.00/=</Text>}
             <Text style={styles.modalSubtitle}>Summary of Input Data:</Text>
             {Object.entries(formData).map(([key, value]) => (
-              <Text key={key} style={styles.modalText}>
-                {`${key.replace(/_/g, ' ')}: ${
+              <View key={key} style={styles.modalText}>
+                <Text>{`${key.replace(/_/g, ' ')}: ${
                   [
                     'has_basement',
                     'renovated',
@@ -157,8 +198,8 @@ const PredictScreen = ({ navigation }) => {
                       ? 'Yes'
                       : 'No'
                     : value
-                }`}
-              </Text>
+                }`}</Text>
+              </View>
             ))}
             <View style={styles.modalButtons}>
               <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
