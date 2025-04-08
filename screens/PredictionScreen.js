@@ -96,7 +96,7 @@ const PredictScreen = ({ navigation }) => {
 
       console.log('Payload:', payload); // Debugging: Log the payload
 
-      const response = await axios.post('http://10.135.151.132:5000/predict', payload, {
+      const response = await axios.post('http://13.61.22.128:5000/predict', payload, {
         headers: { 'Content-Type': 'application/json' },
       });
 
