@@ -35,6 +35,8 @@ const PredictScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [instructionModal, setInstructionModal] = useState(false);
   const [featuresModal, setFeaturesModal] = useState(false);
+  const [quartileTipModal, setQuartileTipModal] = useState(false);
+  const [quartileTipVisible, setQuartileTipVisible] = useState(false);
 
   const handleInputChange = (name, value) => {
     setFormData({ ...formData, [name]: value });
@@ -142,7 +144,15 @@ const PredictScreen = ({ navigation }) => {
 
       {Object.keys(formData).map((key) => (
         <View key={key} style={styles.inputContainer}>
-          <Text style={styles.label}>{key.replace(/_/g, ' ').toUpperCase()}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={styles.label}>{key.replace(/_/g, ' ').toUpperCase()}</Text>
+            {key === 'quartile_zone' && (
+              <TouchableOpacity onPress={() => setQuartileTipVisible(true)} style={{ marginTop: 4 }}>
+                {/* <Text style={{ color: '#2DAA9E', textDecorationLine: 'underline' }}>What is this?</Text> */}
+                <Ionicons name="bulb-outline" size={22} color="#FFA500" />
+              </TouchableOpacity>
+            )}
+          </View>
           {[
             'has_basement',
             'renovated',
@@ -252,7 +262,7 @@ const PredictScreen = ({ navigation }) => {
               <Text style={styles.modalText}>• <Text style={styles.bold}>Has Lavatory:</Text> Yes or No.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Single Floor:</Text> Yes or No.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Month:</Text> Month when the house was listed.</Text>
-              <Text style={styles.modalText}>• <Text style={styles.bold}>Quartile Zone:</Text> Zone classification based on location.</Text>
+              <Text style={styles.modalText}>• <Text style={styles.bold}>Quartile Zone:</Text> Province classification based on location.</Text>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Year:</Text> The year the house was built.</Text>
             </ScrollView>
             <TouchableOpacity style={styles.closeButton} onPress={() => setFeaturesModal(false)}>
@@ -261,6 +271,45 @@ const PredictScreen = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+      {/* Quartile Zone Tip Modal */}
+<Modal
+  animationType="slide"
+  transparent={true}
+  visible={quartileTipVisible}
+  onRequestClose={() => setQuartileTipVisible(false)}
+>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <TouchableOpacity
+        style={styles.closeIcon}
+        onPress={() => setQuartileTipVisible(false)}
+      >
+        <Ionicons name="close-circle" size={28} color="#2DAA9E" />
+      </TouchableOpacity>
+      <Text style={styles.modalTitle}>Quartile Zone Guide</Text>
+      <ScrollView style={{ maxHeight: 300 }}>
+        <Text style={styles.modalText}>1 - Western Province</Text>
+        <Text style={styles.modalText}>2 - Central Province</Text>
+        <Text style={styles.modalText}>3 - Southern Province</Text>
+        <Text style={styles.modalText}>4 - Northern Province</Text>
+        <Text style={styles.modalText}>5 - Eastern Province</Text>
+        <Text style={styles.modalText}>6 - North Western Province</Text>
+        <Text style={styles.modalText}>7 - North Central Province</Text>
+        <Text style={styles.modalText}>8 - Uva Province</Text>
+        <Text style={styles.modalText}>9 - Sabaragamuwa Province</Text>
+      </ScrollView>
+
+      {/* ✅ Make sure this button is outside ScrollView but inside modalContent */}
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => setQuartileTipVisible(false)}
+      >
+        <Text style={styles.buttonText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
     </ScrollView>
   );
 };
@@ -424,7 +473,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     marginBottom: 8,
-  },  
+  },
 });
 
 export default PredictScreen;

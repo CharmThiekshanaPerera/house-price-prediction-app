@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
 
 const MySavedScreen = () => {
   const [savedPredictions, setSavedPredictions] = useState([]);
@@ -31,6 +41,11 @@ const MySavedScreen = () => {
     setRefreshing(true);
     await fetchSavedPredictions();
     setRefreshing(false);
+  };
+
+  // Manual refresh via button
+  const onManualRefresh = () => {
+    fetchSavedPredictions();
   };
 
   // Delete a specific prediction
@@ -67,7 +82,12 @@ const MySavedScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Saved Predictions</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>          My Saved Predictions</Text>
+        <TouchableOpacity onPress={onManualRefresh} style={styles.refreshButton}>
+          <Ionicons name="refresh" size={24} color="#2DAA9E" />
+        </TouchableOpacity>
+      </View>
 
       {loading ? (
         <ActivityIndicator size="large" color="#034B63" style={styles.loader} />
@@ -87,6 +107,8 @@ const MySavedScreen = () => {
   );
 };
 
+export default MySavedScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -94,12 +116,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 20,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#2DAA9E',
-    textAlign: 'center',
-    marginBottom: 20,
+  },
+  refreshButton: {
+    padding: 6,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 3,
   },
   loader: {
     flex: 1,
@@ -151,5 +183,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#EAEAEA',
   },
 });
-
-export default MySavedScreen;
