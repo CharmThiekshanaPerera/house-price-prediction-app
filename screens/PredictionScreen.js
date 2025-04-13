@@ -217,6 +217,9 @@ const PredictScreen = ({ navigation }) => {
       <Modal animationType="slide" transparent={true} visible={instructionModal} onRequestClose={() => setInstructionModal(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.closeIcon} onPress={() => setInstructionModal(false)}>
+              <Ionicons name="close-circle" size={28} color="#2DAA9E" />
+            </TouchableOpacity>
             <Text style={styles.modalTitle}>How to Use</Text>
             <Text style={styles.modalText}>1. Fill in all required fields with accurate data.</Text>
             <Text style={styles.modalText}>2. Use the dropdown to select "Yes" or "No" for binary fields.</Text>
@@ -233,6 +236,9 @@ const PredictScreen = ({ navigation }) => {
       <Modal animationType="slide" transparent={true} visible={featuresModal} onRequestClose={() => setFeaturesModal(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
+            <TouchableOpacity style={styles.closeIcon} onPress={() => setFeaturesModal(false)}>
+              <Ionicons name="close-circle" size={28} color="#2DAA9E" />
+            </TouchableOpacity>
             <Text style={styles.modalTitle}>Features Explained</Text>
             <ScrollView style={{ maxHeight: 300 }}>
               <Text style={styles.modalText}>• <Text style={styles.bold}>Number of Bedrooms:</Text> Total bedrooms in the house.</Text>
@@ -405,6 +411,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  closeIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
+  },
+  iconSpacing: {
+    marginLeft: 15,
+  },
+  instructionText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 8,
+  },  
 });
 
 export default PredictScreen;
